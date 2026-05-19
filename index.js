@@ -1,5 +1,6 @@
-import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config();
+import cors from "cors";
 import express from "express";
 import { connectDB } from "./lib/db.js";
 import ideaRoutes from "./routes/ideaRoutes.js";
