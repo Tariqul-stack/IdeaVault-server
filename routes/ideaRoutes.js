@@ -6,6 +6,7 @@ import {
   updateIdea,
   deleteIdea,
   getMyIdeas,
+  getCategoryStats,
 } from "../controllers/ideaController.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import {
@@ -21,6 +22,7 @@ const router = express.Router();
 router.get("/", getAllIdeas);
 router.get("/my-ideas", verifyToken, getMyIdeas);
 router.get("/user/my-comments", verifyToken, getMyComments);
+router.get("/categories/stats", getCategoryStats);
 router.get("/:id", getIdeaById);
 router.post("/", verifyToken, createIdea);
 router.patch("/:id", verifyToken, updateIdea);

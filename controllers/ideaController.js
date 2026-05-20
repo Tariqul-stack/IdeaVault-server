@@ -201,3 +201,34 @@ export const getMyIdeas = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getCategoryStats = async (req, res, next) => {
+  try {
+    const db = await connectDB();
+    const stats = await db
+      .collection("ideas")
+      .aggregate([
+        {
+          $group: {
+            _id: "$category",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            category: "$_id",
+            count: 1,
+          },
+        },
+        {
+          $sort: { count: -1 },
+        },
+      ])
+      .toArray();
+
+    res.json(stats);
+  } catch (error) {
+    next(error);
+  }
+};
