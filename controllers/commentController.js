@@ -58,6 +58,7 @@ export const createComment = async (req, res, next) => {
     const newComment = {
       ideaId: id,
       ideaTitle: idea.title,
+      ideaCategory: idea.category || null,
       userId: req.user.id,
       userName: req.user.name,
       userImage: req.user.image || null,
@@ -176,8 +177,49 @@ export const getMyComments = async (req, res, next) => {
     const db = await connectDB();
     const comments = await db
       .collection("comments")
-      .find({ userId: req.user.id })
-      .sort({ createdAt: -1 })
+      .aggregate([
+        { 
+          $match: { userId: req.user.id } 
+        },
+        {
+          $addFields: {
+            ideaObjectId: { $toObjectId: "$ideaId" }
+          }
+        },
+        {
+          $lookup: {
+            from: "ideas",
+            localField: "ideaObjectId",
+            foreignField: "_id",
+            as: "ideaData"
+          }
+        },
+        {
+          $addFields: {
+            ideaCategory: {
+              $ifNull: [
+                "$ideaCategory",
+                { $arrayElemAt: ["$ideaData.category", 0] }
+              ]
+            },
+            ideaTitle: {
+              $ifNull: [
+                "$ideaTitle",
+                { $arrayElemAt: ["$ideaData.title", 0] }
+              ]
+            }
+          }
+        },
+        {
+          $project: {
+            ideaData: 0,
+            ideaObjectId: 0
+          }
+        },
+        { 
+          $sort: { createdAt: -1 } 
+        }
+      ])
       .toArray();
 
     res.json(comments);
