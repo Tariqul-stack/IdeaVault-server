@@ -4,6 +4,7 @@ import cors from "cors";
 import express from "express";
 import { connectDB } from "./lib/db.js";
 import ideaRoutes from "./routes/ideaRoutes.js";
+import bookmarkRoutes from "./routes/bookmarkRoutes.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/ideas", ideaRoutes);
+app.use("/api/bookmarks", bookmarkRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
