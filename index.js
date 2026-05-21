@@ -19,14 +19,14 @@ app.use(
 
 app.use(express.json());
 
-// Root route (browser-e open korle response dibe)
+// Root route
 app.get("/", (req, res) => {
   res.json({
     message: "IdeaVault backend running successfully",
   });
 });
 
-// Health check route
+// Health route
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
@@ -34,11 +34,11 @@ app.get("/health", (req, res) => {
   });
 });
 
-// API Routes
+// API routes
 app.use("/api/ideas", ideaRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 
-// 404 route handler
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     message: "Route not found",
@@ -53,8 +53,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Connect DB once for Vercel
+// DB connect
 await connectDB();
 
-// Export app for Vercel
+// Localhost run korar jonno
+if (process.env.NODE_ENV !== "production") {
+  const port = process.env.PORT || 8000;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
+
+// Export for Vercel
 export default app;
