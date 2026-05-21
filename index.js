@@ -51,5 +51,10 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Internal server error" });
 });
+const port = process.env.PORT || 8000;
+
+app.listen(port, () => {
+  console.log(`IdeaVault server listening on http://localhost:${port}`);
+});
 
 export default app;
