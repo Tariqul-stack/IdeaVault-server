@@ -1,24 +1,32 @@
 import dotenv from "dotenv";
 dotenv.config();
+
 import cors from "cors";
 import express from "express";
 import { connectDB } from "./lib/db.js";
 import ideaRoutes from "./routes/ideaRoutes.js";
 import bookmarkRoutes from "./routes/bookmarkRoutes.js";
 
-dotenv.config();
-
 const app = express();
-const port = process.env.PORT || 8000;
 
+// Middleware
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
+
 app.use(express.json());
 
+// Root route (browser-e open korle response dibe)
+app.get("/", (req, res) => {
+  res.json({
+    message: "IdeaVault backend running successfully",
+  });
+});
+
+// Health check route
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
@@ -26,27 +34,27 @@ app.get("/health", (req, res) => {
   });
 });
 
+// API Routes
 app.use("/api/ideas", ideaRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 
+// 404 route handler
 app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
+  res.status(404).json({
+    message: "Route not found",
+  });
 });
 
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: "Internal server error" });
-});
-
-async function startServer() {
-  await connectDB();
-
-  app.listen(port, () => {
-    console.log(`IdeaVault server listening on http://localhost:${port}`);
+  res.status(500).json({
+    message: "Internal server error",
   });
-}
-
-startServer().catch((error) => {
-  console.error("Failed to start IdeaVault server:", error);
-  process.exit(1);
 });
+
+// Connect DB once for Vercel
+await connectDB();
+
+// Export app for Vercel
+export default app;
