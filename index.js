@@ -9,6 +9,9 @@ import bookmarkRoutes from "./routes/bookmarkRoutes.js";
 
 const app = express();
 
+// Connect DB
+await connectDB();
+
 // Middleware
 app.use(
   cors({
@@ -34,35 +37,19 @@ app.get("/health", (req, res) => {
   });
 });
 
-// API routes
+// Routes
 app.use("/api/ideas", ideaRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 
-// 404 handler
+// 404
 app.use((req, res) => {
-  res.status(404).json({
-    message: "Route not found",
-  });
+  res.status(404).json({ message: "Route not found" });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({
-    message: "Internal server error",
-  });
+  res.status(500).json({ message: "Internal server error" });
 });
 
-// DB connect
-await connectDB();
-
-// Localhost run korar jonno
-if (process.env.NODE_ENV !== "production") {
-  const port = process.env.PORT || 8000;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
-}
-
-// Export for Vercel
 export default app;
